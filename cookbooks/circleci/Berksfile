@@ -1,3 +1,5 @@
 source 'https://supermarket.chef.io'
 
+cookbook 'aws', '~> 4.2.2'
+
 metadata
