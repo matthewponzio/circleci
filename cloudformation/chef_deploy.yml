@@ -9,7 +9,7 @@ Parameters:
   Subnet:
     Type: AWS::EC2::Subnet::Id
     Description: Enter the Subnet ID in which your Resources should reside. Default is Office Private Subnet2.
-    Default: subnet-6febbb55
+    Default: subnet-4615346e
   InstanceType:
     Type: String
     Description: Enter the Instance Type to use for your EC2 Instance.
