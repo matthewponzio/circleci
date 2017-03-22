@@ -1,0 +1,18 @@
+machine:
+  services:
+    - docker:
+
+dependencies:
+  pre:
+    - if ! chef -v; then
+        curl -LO https://omnitruck.chef.io/install.sh && sudo bash ./install.sh -P chefdk
+      fi
+    - chef gem install specific_install
+    - sudo chef gem specific_install kitchen-docker -l http://github.com/peterabbott/kitchen-docker.git -b v1.6.4
+    - sudo chef gem uninstall chefspec
+    - chef gem install chefspec:4.0.1
+test:
+  override:
+    - chef exec foodcritic cookbooks/circleci -X spec -f any
+    - aws cloudformation validate-template --template-body file://cloudformation/chef_deploy.yml
+    
