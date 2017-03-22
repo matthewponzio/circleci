@@ -15,3 +15,12 @@ test:
     - chef exec foodcritic cookbooks/circleci -X spec -f any
     - aws configure set default.region us-east-1
     - aws cloudformation validate-template --template-body file://cloudformation/chef_deploy.yml
+deployment:
+  development:
+    branch: master
+    commands:
+      berks package cookbooks.tar.gz -b ./cookbooks/circleci/Berksfile
+      aws s3 cp cookbooks.tar.gz s3://ponzio-test/cookbooks.tar.gz
+      aws s3 cp node.json s3://ponzio-test/node.json
+      aws s3 cp solo.rb s3://ponzio-test/solo.rb
+      aww s3 cp bootstrap.sh s3://ponzio-test/bootstrab.sh
