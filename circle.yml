@@ -13,5 +13,5 @@ dependencies:
 test:
   override:
     - chef exec foodcritic cookbooks/circleci -X spec -f any
-    - export AWS_DEFAULT_REGION=us-east-1
+    - aws configure set default.region us-east-1
     - aws cloudformation validate-template --template-body file://cloudformation/chef_deploy.yml
