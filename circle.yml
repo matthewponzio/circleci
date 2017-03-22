@@ -25,4 +25,4 @@ deployment:
       - aws s3 cp bin/solo.rb s3://ponzio-test/solo.rb
       - aws s3 cp bin/bootstrap.sh s3://ponzio-test/bootstrab.sh
       - aws s3 cp cloudformation/chef_deploy.yml s3://ponzio-test/chef_deploy.yml
-      - aws cloudformation create-stack --stack-name circleci-ponzio-test-`date -u +%m-%d_%H%M-UTC` --template-url https://s3.amazonaws.com/ponzio-test/chef_deploy.yml
+      - aws cloudformation create-stack --stack-name circleci-ponzio-test-`date -u +%m-%d-%H%M-UTC` --template-url https://s3.amazonaws.com/ponzio-test/chef_deploy.yml
