@@ -1,0 +1,149 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Enter the VPC ID where you would like your Resources created. Default is Office VPC.
+    Default: vpc-8223e0e7
+  Subnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: Enter the Subnet ID in which your Resources should reside. Default is Office Private Subnet2.
+    Default: subnet-6febbb55
+  InstanceType:
+    Type: String
+    Description: Enter the Instance Type to use for your EC2 Instance.
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - m1.small
+      - m1.large
+  AMI:
+    Type: AWS::EC2::Image::Id
+    Description: Enter a valid Linux AMI
+    Default: ami-49c9295f
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Enter a valid EC2 Key Pair Name to use for your EC2 Instance.
+    Default: mponzio
+Resources:
+  AppServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for App Server
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 10.0.1.0/24
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 10.0.1.0/24
+        - IpProtocol: icmp
+          FromPort: '-1'
+          ToPort: '-1'
+          CidrIp: 10.0.1.0/24
+      Tags:
+        - Key: Name
+          Value: ChefDeploySG-TEST
+  # AppELBSG:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     GroupDescription: Security Group for App Server ELB
+  #     VpcId:
+  #       Ref: VPC
+  #     SecurityGroupIngress:
+  #       - IpProtocol: tcp
+  #         FromPort: '80'
+  #         ToPort: '80'
+  #         CidrIp: 0.0.0.0/0
+  #     Tags:
+  #       - Key: Name
+  #         Value: CapstoneAppELBSG
+  # AppELB:
+  #   Type: AWS::ElasticLoadBalancing::LoadBalancer
+  #   Properties:
+  #     #LoadBalancerName: CapstoneAppELB
+  #     SecurityGroups:
+  #     - Ref: AppELBSG
+  #     Instances:
+  #     - Ref: AppServerInstance
+  #     Subnets:
+  #     - Ref: Subnet
+  #     Listeners:
+  #     - LoadBalancerPort: '80'
+  #       InstancePort: '8080'
+  #       Protocol: HTTP
+  #     HealthCheck:
+  #       Target:
+  #         Fn::Join:
+  #         - ''
+  #         - - 'HTTP:'
+  #           - 8080
+  #           - "/"
+  #       HealthyThreshold: '3'
+  #       UnhealthyThreshold: '5'
+  #       Interval: '30'
+  #       Timeout: '5'
+  #   DependsOn:
+  #   - AppServerInstance
+  AppServerInstance:
+    Type: AWS::EC2::Instance
+    # Metadata:
+    #   AWS::CloudFormation::Init:
+    #     configSets:
+    #       Install:
+    #       - Install
+    #     Install:
+    #       packages:
+    #         yum:
+    #           mysql: []
+    #           httpd24: []
+    #       services:
+    #         sysvinit:
+    #           httpd:
+    #             enabled: 'true'
+    #             ensureRunning: 'true'
+    Properties:
+      IamInstanceProfile: S3Access
+      ImageId:
+        Ref: AMI
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPair
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: "true"
+        DeviceIndex: "0"
+        SubnetId:
+          Ref: "Subnet"
+        GroupSet:
+          - Ref: AppServerSG
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            ## Install unzip
+            apt-get install unzip
+            ## Download and install AWS CLI
+            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+            unzip awscli-bundle.zip
+            ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+            ## Download and install Chef DK
+            aws s3 cp s3://ponzio-test/chefdk_1.2.22-1_amd64.deb .
+            dpkg -i chefdk_1.2.22-1_amd64.deb
+            ## Download and run bootstrap
+            aws s3 cp s3://ponzio-test/bootstrap.sh .
+            sh ./bootstrap.sh
+      Tags:
+        - Key: Name
+          Value: Chef Deploy - Ponzio test
+Outputs:
+  AppServerInstance:
+    Description: The Instance ID of the EC2 Web Server Instance
+    Value: !Ref AppServerInstance
+  StackID:
+    Description: The Stack ID of this StackID
+    Value: !Ref AWS::StackId
