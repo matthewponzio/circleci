@@ -21,6 +21,6 @@ deployment:
     commands:
       - berks package cookbooks.tar.gz -b ./cookbooks/circleci/Berksfile
       - aws s3 cp cookbooks.tar.gz s3://ponzio-test/cookbooks.tar.gz
-      - aws s3 cp node.json s3://ponzio-test/node.json
-      - aws s3 cp solo.rb s3://ponzio-test/solo.rb
-      - aww s3 cp bootstrap.sh s3://ponzio-test/bootstrab.sh
+      - aws s3 cp bin/node.json s3://ponzio-test/node.json
+      - aws s3 cp bin/solo.rb s3://ponzio-test/solo.rb
+      - aww s3 cp bin/bootstrap.sh s3://ponzio-test/bootstrab.sh
