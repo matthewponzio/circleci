@@ -1,7 +1,6 @@
 machine:
   services:
     - docker
-
 dependencies:
   pre:
     - if ! chef -v; then
@@ -11,7 +10,6 @@ dependencies:
     - sudo chef gem specific_install kitchen-docker -l http://github.com/peterabbott/kitchen-docker.git -b v1.6.4
     - sudo chef gem uninstall chefspec
     - chef gem install chefspec:4.0.1
-
 test:
   override:
     - chef exec foodcritic cookbooks/circleci -X spec -f any
