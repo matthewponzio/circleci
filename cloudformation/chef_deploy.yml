@@ -133,8 +133,8 @@ Resources:
             unzip awscli-bundle.zip
             ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
             ## Download and install Chef DK
-            aws s3 cp s3://ponzio-test/chefdk_1.2.22-1_amd64.deb .
-            dpkg -i chefdk_1.2.22-1_amd64.deb
+            # aws s3 cp s3://ponzio-test/chefdk_1.2.22-1_amd64.deb .
+            # dpkg -i chefdk_1.2.22-1_amd64.deb
             ## Download and run bootstrap
             aws s3 cp s3://ponzio-test/bootstrap.sh .
             sh ./bootstrap.sh
