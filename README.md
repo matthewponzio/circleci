@@ -1,6 +1,8 @@
 # CircleCI
 Repo for basic CircleCI Pipeline...for deploying CircleCI
 
+This Project is running on CircleCI.com
+
 ## Chef Cookbook
 The current Chef Coookbook, while called CircleCI, does NOT deploy CircleCI
 It only installs Apache and configures a "hello world" main page
