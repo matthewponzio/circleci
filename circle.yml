@@ -34,4 +34,6 @@ deployment:
       - if [ "$BUILD_TYPE" =  "PROD" ]; then
           echo "Build type is $BUILD_TYPE - No Pre-Deploy Tasks - ONLY Deployment";
           aws cloudformation create-stack --stack-name circleci-ponzio-test-`date -u +%m-%d-%H%M-UTC` --template-url https://s3.amazonaws.com/ponzio-test/chef_deploy.yml;
+        else
+          echo "Build type is $BUILD_TYPE - NO Deployment";
         fi
