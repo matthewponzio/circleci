@@ -1,8 +1,6 @@
 machine:
   services:
     - docker
-  environment:
-    BUILD_TYPE: NON-PROD
 dependencies:
   pre:
     - if ! chef -v; then
@@ -22,7 +20,7 @@ deployment:
   development:
     branch: master
     commands:
-      - if [ "$BUILD_TYPE" = "NON-PROD" ]; then
+      - if [ "$BUILD_TYPE" != "PROD" ]; then
           echo "Build type is $BUILD_TYPE - Running Pre-Deploy Pipeline - NO Deployment";
           berks package circleci.tar.gz -b ./cookbooks/circleci/Berksfile;
           aws s3 cp circleci.tar.gz s3://ponzio-test/circleci.tar.gz;
