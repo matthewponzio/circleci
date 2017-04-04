@@ -33,3 +33,4 @@ CircleCI configuration file that defines the pipeline actions
     - bootstrap.sh
     - CFN: chef_deploy.yml
   - Runs cloudformation create-stack
+  test
