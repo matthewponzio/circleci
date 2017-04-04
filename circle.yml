@@ -1,6 +1,8 @@
 machine:
   services:
     - docker
+  environment:
+    BUILD_TYPE: NON-PROD
 dependencies:
   pre:
     - if ! chef -v; then
@@ -20,13 +22,16 @@ deployment:
   development:
     branch: master
     commands:
-      - berks package circleci.tar.gz -b ./cookbooks/circleci/Berksfile
-      - aws s3 cp circleci.tar.gz s3://ponzio-test/circleci.tar.gz
-      - aws s3 cp bin/node.json s3://ponzio-test/node.json
-      - aws s3 cp bin/solo.rb s3://ponzio-test/solo.rb
-      - aws s3 cp bin/bootstrap.sh s3://ponzio-test/bootstrap.sh
-      - aws s3 cp cloudformation/chef_deploy.yml s3://ponzio-test/chef_deploy.yml
+      - if [ "$BUILD_TYPE" = "NON-PROD" ]; then
+          echo "Build type is $BUILD_TYPE - Running Pre-Deploy Pipeline - NO Deployment";
+          berks package circleci.tar.gz -b ./cookbooks/circleci/Berksfile;
+          aws s3 cp circleci.tar.gz s3://ponzio-test/circleci.tar.gz;
+          aws s3 cp bin/node.json s3://ponzio-test/node.json;
+          aws s3 cp bin/solo.rb s3://ponzio-test/solo.rb;
+          aws s3 cp bin/bootstrap.sh s3://ponzio-test/bootstrap.sh;
+          aws s3 cp cloudformation/chef_deploy.yml s3://ponzio-test/chef_deploy.yml;
+        fi
       - if [ "$BUILD_TYPE" =  "PROD" ]; then
+          echo "Build type is $BUILD_TYPE - No Pre-Deploy Tasks - ONLY Deployment";
           aws cloudformation create-stack --stack-name circleci-ponzio-test-`date -u +%m-%d-%H%M-UTC` --template-url https://s3.amazonaws.com/ponzio-test/chef_deploy.yml;
-        else echo "Build type is NON-PROD - No Deployment!";
         fi
